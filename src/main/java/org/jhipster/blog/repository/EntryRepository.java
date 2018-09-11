@@ -27,4 +27,6 @@ public interface EntryRepository extends JpaRepository<Entry, Long> {
     @Query("select entry from Entry entry left join fetch entry.tags where entry.id =:id")
     Optional<Entry> findOneWithEagerRelationships(@Param("id") Long id);
 
+    @Query("select entry from Entry entry where entry.blog.user.login = :currentUserLogin order by date desc")
+    Page<Entry> findByBlogUserLoginOrderByDateDesc(@Param("currentUserLogin") String currentUserLogin, Pageable pageable);
 }

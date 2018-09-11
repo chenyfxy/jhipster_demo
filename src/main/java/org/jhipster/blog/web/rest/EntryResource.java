@@ -3,6 +3,7 @@ package org.jhipster.blog.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import org.jhipster.blog.domain.Entry;
 import org.jhipster.blog.repository.EntryRepository;
+import org.jhipster.blog.security.SecurityUtils;
 import org.jhipster.blog.web.rest.errors.BadRequestAlertException;
 import org.jhipster.blog.web.rest.util.HeaderUtil;
 import org.jhipster.blog.web.rest.util.PaginationUtil;
@@ -97,7 +98,9 @@ public class EntryResource {
         if (eagerload) {
             page = entryRepository.findAllWithEagerRelationships(pageable);
         } else {
-            page = entryRepository.findAll(pageable);
+            String userLogin = SecurityUtils.getCurrentUserLogin().get();
+
+            page = entryRepository.findByBlogUserLoginOrderByDateDesc(userLogin, pageable);
         }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, String.format("/api/entries?eagerload=%b", eagerload));
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
